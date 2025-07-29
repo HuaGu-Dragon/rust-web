@@ -1,2 +1,6 @@
 [server]
 port = 3000
+
+[database]
+password = "root"
+database = "chat_db"

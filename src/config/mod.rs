@@ -6,6 +6,9 @@ use serde::Deserialize;
 
 use server::ServerConfig;
 
+use database::DataBaseConfig;
+
+mod database;
 mod server;
 
 static CONFIG: LazyLock<AppConfig> =
@@ -13,7 +16,8 @@ static CONFIG: LazyLock<AppConfig> =
 
 #[derive(Debug, Deserialize)]
 pub struct AppConfig {
-    pub server: ServerConfig,
+    server: ServerConfig,
+    database: DataBaseConfig,
 }
 
 impl AppConfig {
@@ -34,6 +38,14 @@ impl AppConfig {
             .context("Build the configuration")?
             .try_deserialize()
             .context("Deserialize the configuration")
+    }
+
+    pub fn server(&self) -> &ServerConfig {
+        &self.server
+    }
+
+    pub fn database(&self) -> &DataBaseConfig {
+        &self.database
     }
 }
 

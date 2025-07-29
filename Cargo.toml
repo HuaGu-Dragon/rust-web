@@ -7,6 +7,7 @@ edition = "2024"
 anyhow = "1.0.98"
 axum = "0.8.4"
 config = { version = "0.15.13", features = ["toml"] }
+sea-orm = { version = "1.1.14", features = ["with-chrono", "debug-print", "sqlx-postgres", "with-rust_decimal", "runtime-tokio"] }
 serde = { version = "1.0.219", features = ["derive"] }
 tokio = { version = "1.47.0", features = ["full"] }
 tracing = { version = "0.1.41", features = ["async-await"] }
