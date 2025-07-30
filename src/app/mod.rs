@@ -2,11 +2,16 @@ use axum::Router;
 use sea_orm::DatabaseConnection;
 use tracing::info;
 
-use crate::{config, database, logger};
+use crate::{
+    app::{error::ApiResult, response::ApiResponse},
+    config, database, logger,
+};
 
 pub mod error;
 pub mod response;
 mod server;
+
+pub type ApiReturn<T> = ApiResult<ApiResponse<T>>;
 
 #[derive(Clone)]
 pub struct AppState {
