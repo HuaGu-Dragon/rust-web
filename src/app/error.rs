@@ -1,6 +1,5 @@
 use axum::{Json, response::IntoResponse};
-
-use crate::app::response::ApiResponse;
+use serde::Serialize;
 
 pub type ApiResult<T> = Result<T, ApiError>;
 
@@ -12,6 +11,12 @@ pub enum ApiError {
     MethodNotAllowed,
     #[error("Internal Server Error")]
     Internal(#[from] anyhow::Error),
+}
+
+#[derive(Debug, Serialize)]
+pub struct ErrorResponse {
+    pub code: u16,
+    pub error: String,
 }
 
 impl ApiError {
@@ -27,7 +32,10 @@ impl ApiError {
 impl IntoResponse for ApiError {
     fn into_response(self) -> axum::response::Response {
         let status = self.status_code();
-        let body = Json(ApiResponse::error(status.as_u16(), self.to_string()));
+        let body = Json(ErrorResponse {
+            code: status.as_u16(),
+            error: self.to_string(),
+        });
 
         (status, body).into_response()
     }
