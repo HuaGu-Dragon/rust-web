@@ -12,7 +12,7 @@ pub struct DataBaseConfig {
 
 impl DataBaseConfig {
     pub fn host(&self) -> &str {
-        self.host.as_deref().unwrap_or("localhost")
+        self.host.as_deref().unwrap_or("127.0.0.1")
     }
 
     pub fn port(&self) -> u16 {
