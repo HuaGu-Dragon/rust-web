@@ -9,7 +9,7 @@ use server::ServerConfig;
 use database::DataBaseConfig;
 
 mod database;
-mod server;
+pub mod server;
 
 static CONFIG: LazyLock<AppConfig> =
     LazyLock::new(|| AppConfig::load().expect("Failed to load configuration"));
