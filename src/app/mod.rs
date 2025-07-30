@@ -4,6 +4,8 @@ use tracing::info;
 
 use crate::{config, database, logger};
 
+pub mod error;
+pub mod response;
 mod server;
 
 #[derive(Clone)]
