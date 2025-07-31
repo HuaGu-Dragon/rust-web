@@ -1,10 +1,15 @@
 use std::net::SocketAddr;
 
-use axum::Router;
+use axum::{Router, extract::Request};
 use tokio::net::TcpListener;
+use tower_http::trace::TraceLayer;
 use tracing::info;
+use uuid::Uuid;
 
-use crate::{app::AppState, config::server::ServerConfig};
+use crate::{
+    app::{AppState, latency::LatencyLayer},
+    config::server::ServerConfig,
+};
 
 pub struct Server {
     config: &'static ServerConfig,
@@ -32,6 +37,24 @@ impl Server {
     }
 
     fn build_router(&self, router: Router<AppState>, state: AppState) -> anyhow::Result<Router> {
-        Ok(Router::new().merge(router).with_state(state))
+        Ok(Router::new()
+            .merge(router)
+            .layer(
+                TraceLayer::new_for_http()
+                    .make_span_with(|request: &Request| {
+                        let id = Uuid::new_v4();
+                        tracing::info_span!(
+                            "http_request",
+                            id = %id,
+                            method = %request.method(),
+                            uri = %request.uri(),
+                            version = ?request.version(),
+                        )
+                    })
+                    .on_request(())
+                    .on_response(LatencyLayer)
+                    .on_failure(()),
+            )
+            .with_state(state))
     }
 }

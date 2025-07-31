@@ -8,6 +8,7 @@ use crate::{
 };
 
 pub mod error;
+mod latency;
 pub mod response;
 mod server;
 
