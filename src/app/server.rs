@@ -1,8 +1,11 @@
-use std::net::SocketAddr;
+use std::{net::SocketAddr, time::Duration};
 
 use axum::{Router, extract::Request};
 use tokio::net::TcpListener;
-use tower_http::trace::TraceLayer;
+use tower_http::{
+    cors::CorsLayer, limit::RequestBodyLimitLayer, normalize_path::NormalizePathLayer,
+    timeout::TimeoutLayer, trace::TraceLayer,
+};
 use tracing::info;
 use uuid::Uuid;
 
@@ -39,6 +42,8 @@ impl Server {
     fn build_router(&self, router: Router<AppState>, state: AppState) -> anyhow::Result<Router> {
         Ok(Router::new()
             .merge(router)
+            .layer(NormalizePathLayer::trim_trailing_slash())
+            .layer(RequestBodyLimitLayer::new(10 * 1024 * 1024))
             .layer(
                 TraceLayer::new_for_http()
                     .make_span_with(|request: &Request| {
@@ -55,6 +60,8 @@ impl Server {
                     .on_response(LatencyLayer)
                     .on_failure(()),
             )
+            .layer(CorsLayer::permissive())
+            .layer(TimeoutLayer::new(Duration::from_secs(30)))
             .with_state(state))
     }
 }
