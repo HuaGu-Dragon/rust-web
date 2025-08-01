@@ -9,6 +9,7 @@ axum = "0.8.4"
 config = { version = "0.15.13", features = ["toml"] }
 sea-orm = { version = "1.1.14", features = ["with-chrono", "debug-print", "sqlx-postgres", "with-rust_decimal", "runtime-tokio"] }
 serde = { version = "1.0.219", features = ["derive"] }
+serde_with = "3.14.0"
 thiserror = "2.0.12"
 tokio = { version = "1.47.0", features = ["full"] }
 tower-http = { version = "0.6.6", features = ["cors", "limit", "normalize-path", "timeout", "trace"] }

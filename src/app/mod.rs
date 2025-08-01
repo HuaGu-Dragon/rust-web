@@ -9,6 +9,7 @@ use crate::{
 
 pub mod error;
 mod latency;
+pub mod params;
 pub mod response;
 mod server;
 
