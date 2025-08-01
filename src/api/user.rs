@@ -11,8 +11,10 @@ use axum::{
     extract::{Query, State},
     routing,
 };
+use axum_valid::Valid;
 use sea_orm::{Condition, QueryOrder, QueryTrait, prelude::*};
 use serde::Deserialize;
+use validator::Validate;
 
 use crate::app::{AppState, response::ApiResponse};
 
@@ -20,19 +22,20 @@ pub fn create_router() -> Router<AppState> {
     Router::new().route("/", routing::get(get_users))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Validate)]
 struct UserQueryParams {
     keyword: Option<String>,
+    #[validate(nested)]
     #[serde(flatten)]
     pagination: QueryParams,
 }
 
 async fn get_users(
     State(AppState { db }): State<AppState>,
-    Query(UserQueryParams {
+    Valid(Query(UserQueryParams {
         keyword,
         pagination,
-    }): Query<UserQueryParams>,
+    })): Valid<Query<UserQueryParams>>,
 ) -> ApiReturn<Page<sys_user::Model>> {
     let paginator = SysUser::find()
         .apply_if(keyword.as_ref(), |query, keyword| {

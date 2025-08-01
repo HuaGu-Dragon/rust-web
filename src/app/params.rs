@@ -1,12 +1,15 @@
 use serde::{Deserialize, Serialize};
 use serde_with::{DisplayFromStr, serde_as};
+use validator::Validate;
 
 #[serde_as]
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Validate)]
 pub struct QueryParams {
+    #[validate(range(min = 1, message = "Page must be greater than 0"))]
     #[serde_as(as = "DisplayFromStr")]
     #[serde(default = "one")]
     pub page: u64,
+    #[validate(range(min = 1, max = 100, message = "Page size must be between 1 and 100"))]
     #[serde_as(as = "DisplayFromStr")]
     #[serde(default = "ten")]
     pub page_size: u64,
