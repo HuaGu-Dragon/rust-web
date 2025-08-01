@@ -8,6 +8,7 @@ use crate::{
 };
 
 pub mod error;
+pub mod extract;
 mod latency;
 pub mod params;
 pub mod response;

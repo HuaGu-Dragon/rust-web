@@ -1,17 +1,13 @@
 use crate::{
     app::{
         ApiReturn,
+        extract::ValidQuery,
         params::{Page, QueryParams},
     },
     entity::{prelude::*, sys_user},
 };
 use anyhow::Context;
-use axum::{
-    Router,
-    extract::{Query, State},
-    routing,
-};
-use axum_valid::Valid;
+use axum::{Router, extract::State, routing};
 use sea_orm::{Condition, QueryOrder, QueryTrait, prelude::*};
 use serde::Deserialize;
 use validator::Validate;
@@ -32,10 +28,10 @@ struct UserQueryParams {
 
 async fn get_users(
     State(AppState { db }): State<AppState>,
-    Valid(Query(UserQueryParams {
+    ValidQuery(UserQueryParams {
         keyword,
         pagination,
-    })): Valid<Query<UserQueryParams>>,
+    }): ValidQuery<UserQueryParams>,
 ) -> ApiReturn<Page<sys_user::Model>> {
     let paginator = SysUser::find()
         .apply_if(keyword.as_ref(), |query, keyword| {

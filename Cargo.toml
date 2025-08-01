@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.98"
-axum = "0.8.4"
+axum = { version = "0.8.4", features = ["macros"] }
 axum-valid = { version = "0.24.0", features = ["full_validator"] }
 config = { version = "0.15.13", features = ["toml"] }
 sea-orm = { version = "1.1.14", features = ["with-chrono", "debug-print", "sqlx-postgres", "with-rust_decimal", "runtime-tokio"] }
