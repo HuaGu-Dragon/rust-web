@@ -9,3 +9,17 @@ GET http://0.0.0.0:3000/api/1 HTTP/1.1
 ###
 
 GET http://0.0.0.0:3000/api/users HTTP/1.1
+
+### Create_User
+
+POST http://0.0.0.0:3000/api/users HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "王五",
+    "gender": "male",
+    "account": "wangwu",
+    "password": "123456",
+    "mobile_phone": "18361631783",
+    "birthday": "2025-06-11"
+}

@@ -32,7 +32,7 @@ impl ActiveModelBehavior for ActiveModel {
         C: ConnectionTrait,
     {
         if insert {
-            self.id = ActiveValue::Set(Uuid::now_v7().to_string());
+            self.id = ActiveValue::Set(Uuid::now_v7().simple().to_string());
         }
         Ok(self)
     }
