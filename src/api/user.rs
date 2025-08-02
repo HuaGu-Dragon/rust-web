@@ -5,6 +5,7 @@ use crate::{
         params::{Page, QueryParams},
     },
     entity::{
+        gender::Gender,
         prelude::*,
         sys_user::{self, ActiveModel},
     },
@@ -43,7 +44,7 @@ struct UserParams {
         message = "Name must be between 1 and 16 characters long"
     ))]
     pub name: String,
-    pub gender: String,
+    pub gender: Gender,
     #[validate(length(
         min = 1,
         max = 16,

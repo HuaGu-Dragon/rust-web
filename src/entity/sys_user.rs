@@ -3,6 +3,8 @@
 use sea_orm::{ActiveValue, entity::prelude::*, prelude::async_trait::async_trait};
 use serde::{Deserialize, Serialize};
 
+use crate::entity::gender::Gender;
+
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "sys_user")]
 #[serde(rename_all = "camelCase")]
@@ -10,7 +12,7 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
     pub name: String,
-    pub gender: String,
+    pub gender: Gender,
     pub account: String,
     pub password: String,
     pub mobile_phone: String,
