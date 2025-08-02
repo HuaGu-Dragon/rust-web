@@ -1,3 +1,4 @@
+use argon2::password_hash::Error;
 use axum::{
     Json,
     extract::rejection::{JsonRejection, PathRejection, QueryRejection},
@@ -22,6 +23,8 @@ pub enum ApiError {
     InvalidJsonBody(#[from] JsonRejection),
     #[error("Validation error: {0}")]
     ValidationError(String),
+    #[error("Failed to hash password: {0}")]
+    HashPassword(String),
     #[error("Internal Server Error")]
     Internal(#[from] anyhow::Error),
 }
@@ -35,6 +38,12 @@ impl From<ValidRejection<ApiError>> for ApiError {
     }
 }
 
+impl From<Error> for ApiError {
+    fn from(value: Error) -> Self {
+        Self::HashPassword(value.to_string())
+    }
+}
+
 #[derive(Debug, Serialize)]
 pub struct ErrorResponse {
     pub code: u16,
@@ -45,7 +54,9 @@ impl ApiError {
     pub fn status_code(&self) -> axum::http::StatusCode {
         match self {
             ApiError::NotFound => axum::http::StatusCode::NOT_FOUND,
-            ApiError::Internal(_) => axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Internal(_) | ApiError::HashPassword(_) => {
+                axum::http::StatusCode::INTERNAL_SERVER_ERROR
+            }
             ApiError::MethodNotAllowed => axum::http::StatusCode::METHOD_NOT_ALLOWED,
             ApiError::InvalidQueryParams(_)
             | ApiError::InvalidPathParams(_)

@@ -13,6 +13,7 @@ mod latency;
 pub mod params;
 pub mod response;
 mod server;
+pub mod validation;
 
 pub type ApiReturn<T> = ApiResult<ApiResponse<T>>;
 
