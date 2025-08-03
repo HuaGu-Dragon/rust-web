@@ -1,3 +1,5 @@
+use std::sync::LazyLock;
+
 use crate::{
     app::{
         ApiReturn,
@@ -12,7 +14,7 @@ use crate::{
 };
 use anyhow::Context;
 use argon2::{
-    Argon2, PasswordHasher,
+    Argon2, Params, PasswordHasher,
     password_hash::{SaltString, rand_core::OsRng},
 };
 use axum::{Router, extract::State, routing};
@@ -27,6 +29,12 @@ pub fn create_router() -> Router<AppState> {
         .route("/", routing::get(get_users).post(create_user))
         .route("/{id}", routing::put(update_user).delete(delete_user))
 }
+
+static FAST_ARGON2: LazyLock<Argon2> = LazyLock::new(|| {
+    let params = Params::new(4096, 1, 1, Some(32)).expect("Valid Argon2 params");
+
+    Argon2::new(argon2::Algorithm::Argon2id, argon2::Version::V0x13, params)
+});
 
 #[derive(Debug, Deserialize, Validate)]
 struct UserQueryParams {
@@ -64,20 +72,29 @@ struct UserParams {
     pub enabled: bool,
 }
 
+pub fn hash_password_fast(password: &str) -> Result<String, argon2::password_hash::Error> {
+    FAST_ARGON2
+        .hash_password(password.as_bytes(), &SaltString::generate(&mut OsRng))
+        .map(|hash| hash.to_string())
+}
+
+// pub fn verify_password(password: &str, hash: &str) -> Result<bool, argon2::password_hash::Error> {
+//     use argon2::PasswordVerifier;
+//     use argon2::password_hash::PasswordHash;
+
+//     let parsed_hash = PasswordHash::new(hash)?;
+//     Ok(FAST_ARGON2
+//         .verify_password(password.as_bytes(), &parsed_hash)
+//         .is_ok())
+// }
+
 async fn create_user(
     State(AppState { db }): State<AppState>,
     ValidJson(user_params): ValidJson<UserParams>,
 ) -> ApiReturn<sys_user::Model> {
     let mut active_model = user_params.into_active_model();
 
-    active_model.password = ActiveValue::set(
-        Argon2::default()
-            .hash_password(
-                active_model.password.take().unwrap().as_bytes(),
-                &SaltString::generate(&mut OsRng),
-            )?
-            .to_string(),
-    );
+    active_model.password = ActiveValue::set(hash_password_fast(active_model.password.as_ref())?);
 
     Ok(ApiResponse::success(
         active_model.insert(&db).await.context("Create user")?,
@@ -100,18 +117,11 @@ async fn update_user(
     active_model.id = ActiveValue::Unchanged(user_id);
 
     active_model.password = {
-        let password = active_model.password.take().unwrap();
+        let password = active_model.password.as_ref();
         if password.is_empty() {
-            ActiveValue::Unchanged(password)
+            ActiveValue::Unchanged(active_model.password.take().unwrap())
         } else {
-            ActiveValue::set(
-                Argon2::default()
-                    .hash_password(
-                        active_model.password.take().unwrap().as_bytes(),
-                        &SaltString::generate(&mut OsRng),
-                    )?
-                    .to_string(),
-            )
+            ActiveValue::set(hash_password_fast(password)?)
         }
     };
     Ok(ApiResponse::success(
