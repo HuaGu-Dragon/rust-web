@@ -106,24 +106,27 @@ async fn update_user(
     Path(user_id): Path<String>,
     ValidJson(user_params): ValidJson<UserParams>,
 ) -> ApiReturn<sys_user::Model> {
-    // let user = SysUser::find_by_id(user_id)
-    //     .one(&db)
-    //     .await
-    //     .context("Find User")?
-    //     .ok_or_else(|| anyhow::anyhow!("User not found"))?;
+    let user = SysUser::find_by_id(user_id)
+        .one(&db)
+        .await
+        .context("Find User")?
+        .ok_or_else(|| anyhow::anyhow!("User not found"))?;
 
-    let mut active_model = user_params.into_active_model();
+    let mut active_model = user.into_active_model();
 
-    active_model.id = ActiveValue::Unchanged(user_id);
+    active_model.name = ActiveValue::Set(user_params.name);
+    active_model.gender = ActiveValue::Set(user_params.gender);
+    active_model.account = ActiveValue::Set(user_params.account);
+    active_model.mobile_phone = ActiveValue::Set(user_params.mobile_phone);
+    active_model.birthday = ActiveValue::Set(user_params.birthday);
+    active_model.enabled = ActiveValue::Set(user_params.enabled);
 
-    active_model.password = {
-        let password = active_model.password.as_ref();
-        if password.is_empty() {
-            ActiveValue::Unchanged(active_model.password.take().unwrap())
-        } else {
-            ActiveValue::set(hash_password_fast(password)?)
-        }
-    };
+    if !user_params.password.is_empty() {
+        active_model.password = ActiveValue::Set(hash_password_fast(&user_params.password)?);
+    } else {
+        active_model.not_set(sys_user::Column::Password);
+    }
+
     Ok(ApiResponse::success(
         active_model.update(&db).await.context("Update user")?,
     ))

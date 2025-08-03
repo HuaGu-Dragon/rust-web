@@ -14,6 +14,7 @@ pub struct Model {
     pub name: String,
     pub gender: Gender,
     pub account: String,
+    #[serde(skip_serializing)]
     pub password: String,
     pub mobile_phone: String,
     pub birthday: Date,
