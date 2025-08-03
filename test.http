@@ -32,12 +32,7 @@ PUT http://0.0.0.0:3000/api/users/{{user}} HTTP/1.1
 Content-Type: application/json
 
 {
-    "name": "李四2",
-    "gender": "male",
-    "account": "wang",
-    "password": "123456",
-    "mobile_phone": "18361631781",
-    "birthday": "2025-06-11"
+    "name": "李四"
 }
 
 ### Delete User

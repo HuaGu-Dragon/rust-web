@@ -72,6 +72,33 @@ struct UserParams {
     pub enabled: bool,
 }
 
+#[derive(Debug, Clone, Deserialize, Validate)]
+struct UpdateUserParams {
+    #[validate(length(
+        min = 1,
+        max = 16,
+        message = "Name must be between 1 and 16 characters long"
+    ))]
+    pub name: Option<String>,
+    pub gender: Option<Gender>,
+    #[validate(length(
+        min = 1,
+        max = 16,
+        message = "Account must be between 1 and 16 characters long"
+    ))]
+    pub account: Option<String>,
+    #[validate(length(
+        min = 6,
+        max = 16,
+        message = "Password must be between 6 and 16 characters long"
+    ))]
+    pub password: Option<String>,
+    #[validate(custom(function = "crate::app::validation::validate_mobile_phone"))]
+    pub mobile_phone: Option<String>,
+    pub birthday: Option<Date>,
+    pub enabled: Option<bool>,
+}
+
 pub fn hash_password_fast(password: &str) -> Result<String, argon2::password_hash::Error> {
     FAST_ARGON2
         .hash_password(password.as_bytes(), &SaltString::generate(&mut OsRng))
@@ -101,10 +128,18 @@ async fn create_user(
     ))
 }
 
+macro_rules! update_params {
+    ($active_model:expr, $field:ident, $value:expr) => {
+        if let Some(value) = $value {
+            $active_model.$field = ActiveValue::Set(value);
+        }
+    };
+}
+
 async fn update_user(
     State(AppState { db }): State<AppState>,
     Path(user_id): Path<String>,
-    ValidJson(user_params): ValidJson<UserParams>,
+    ValidJson(user_params): ValidJson<UpdateUserParams>,
 ) -> ApiReturn<sys_user::Model> {
     let user = SysUser::find_by_id(user_id)
         .one(&db)
@@ -114,17 +149,15 @@ async fn update_user(
 
     let mut active_model = user.into_active_model();
 
-    active_model.name = ActiveValue::Set(user_params.name);
-    active_model.gender = ActiveValue::Set(user_params.gender);
-    active_model.account = ActiveValue::Set(user_params.account);
-    active_model.mobile_phone = ActiveValue::Set(user_params.mobile_phone);
-    active_model.birthday = ActiveValue::Set(user_params.birthday);
-    active_model.enabled = ActiveValue::Set(user_params.enabled);
+    update_params!(active_model, name, user_params.name);
+    update_params!(active_model, gender, user_params.gender);
+    update_params!(active_model, account, user_params.account);
+    update_params!(active_model, mobile_phone, user_params.mobile_phone);
+    update_params!(active_model, birthday, user_params.birthday);
+    update_params!(active_model, enabled, user_params.enabled);
 
-    if !user_params.password.is_empty() {
-        active_model.password = ActiveValue::Set(hash_password_fast(&user_params.password)?);
-    } else {
-        active_model.not_set(sys_user::Column::Password);
+    if let Some(password) = user_params.password {
+        active_model.password = ActiveValue::Set(hash_password_fast(&password)?);
     }
 
     Ok(ApiResponse::success(
