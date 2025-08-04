@@ -8,6 +8,9 @@ use server::ServerConfig;
 
 use database::DataBaseConfig;
 
+use auth::JwtConfig;
+
+mod auth;
 mod database;
 pub mod server;
 
@@ -16,6 +19,7 @@ static CONFIG: LazyLock<AppConfig> =
 
 #[derive(Debug, Deserialize)]
 pub struct AppConfig {
+    auth: JwtConfig,
     server: ServerConfig,
     database: DataBaseConfig,
 }
@@ -38,6 +42,10 @@ impl AppConfig {
             .context("Build the configuration")?
             .try_deserialize()
             .context("Deserialize the configuration")
+    }
+
+    pub fn auth(&self) -> &JwtConfig {
+        &self.auth
     }
 
     pub fn server(&self) -> &ServerConfig {

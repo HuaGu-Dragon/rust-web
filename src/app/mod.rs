@@ -7,6 +7,7 @@ use crate::{
     config, database, logger,
 };
 
+mod auth;
 pub mod error;
 pub mod extract;
 mod latency;
