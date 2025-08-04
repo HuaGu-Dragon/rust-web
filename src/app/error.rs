@@ -25,6 +25,8 @@ pub enum ApiError {
     ValidationError(String),
     #[error("Failed to hash password: {0}")]
     HashPassword(String),
+    #[error("JWT Error: {0}")]
+    JwtError(#[from] jsonwebtoken::errors::Error),
     #[error("Internal Server Error")]
     Internal(#[from] anyhow::Error),
 }
@@ -64,6 +66,7 @@ impl ApiError {
                 tracing::warn!(error = ?e, "Internal server error");
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR
             }
+            ApiError::JwtError(_) => axum::http::StatusCode::UNAUTHORIZED,
         }
     }
 }

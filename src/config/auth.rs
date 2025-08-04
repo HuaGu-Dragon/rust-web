@@ -5,6 +5,7 @@ use serde::Deserialize;
 pub struct JwtConfig {
     pub secret: Option<String>,
     pub algorithm: Option<Algorithm>,
+    pub expiration: Option<u64>,
 }
 
 impl JwtConfig {
@@ -14,5 +15,9 @@ impl JwtConfig {
 
     pub fn algorithm(&self) -> Algorithm {
         self.algorithm.unwrap_or_default()
+    }
+
+    pub fn expiration(&self) -> u64 {
+        self.expiration.unwrap_or(3600)
     }
 }
