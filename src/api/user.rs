@@ -1,10 +1,9 @@
-use std::sync::LazyLock;
-
 use crate::{
     app::{
         ApiReturn,
         extract::{Path, ValidJson, ValidQuery},
         params::{Page, QueryParams},
+        util::hash_password_fast,
     },
     entity::{
         gender::Gender,
@@ -13,10 +12,6 @@ use crate::{
     },
 };
 use anyhow::Context;
-use argon2::{
-    Argon2, Params, PasswordHasher,
-    password_hash::{SaltString, rand_core::OsRng},
-};
 use axum::{Router, extract::State, routing};
 use sea_orm::{ActiveValue, Condition, IntoActiveModel, QueryOrder, QueryTrait, prelude::*};
 use serde::Deserialize;
@@ -29,12 +24,6 @@ pub fn create_router() -> Router<AppState> {
         .route("/", routing::get(get_users).post(create_user))
         .route("/{id}", routing::put(update_user).delete(delete_user))
 }
-
-static FAST_ARGON2: LazyLock<Argon2> = LazyLock::new(|| {
-    let params = Params::new(4096, 1, 1, Some(32)).expect("Valid Argon2 params");
-
-    Argon2::new(argon2::Algorithm::Argon2id, argon2::Version::V0x13, params)
-});
 
 #[derive(Debug, Deserialize, Validate)]
 struct UserQueryParams {
@@ -98,22 +87,6 @@ struct UpdateUserParams {
     pub birthday: Option<Date>,
     pub enabled: Option<bool>,
 }
-
-pub fn hash_password_fast(password: &str) -> Result<String, argon2::password_hash::Error> {
-    FAST_ARGON2
-        .hash_password(password.as_bytes(), &SaltString::generate(&mut OsRng))
-        .map(|hash| hash.to_string())
-}
-
-// pub fn verify_password(password: &str, hash: &str) -> Result<bool, argon2::password_hash::Error> {
-//     use argon2::PasswordVerifier;
-//     use argon2::password_hash::PasswordHash;
-
-//     let parsed_hash = PasswordHash::new(hash)?;
-//     Ok(FAST_ARGON2
-//         .verify_password(password.as_bytes(), &parsed_hash)
-//         .is_ok())
-// }
 
 async fn create_user(
     State(AppState { db }): State<AppState>,

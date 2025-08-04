@@ -1,11 +1,14 @@
 use axum::Router;
+use tower_http::auth::AsyncRequireAuthorizationLayer;
 use tracing::warn;
 
 use crate::app::{
     AppState,
     error::{ApiError, ApiResult},
+    middleware::AuthLayer,
 };
 
+mod auth;
 mod user;
 
 pub fn create_router() -> Router<AppState> {
@@ -13,7 +16,11 @@ pub fn create_router() -> Router<AppState> {
         .nest(
             "/api",
             Router::new()
-                .nest("/users", user::create_router())
+                .nest(
+                    "/users",
+                    user::create_router().layer(AsyncRequireAuthorizationLayer::new(AuthLayer)),
+                )
+                .nest("/auth", auth::create_router())
                 .fallback(async || -> ApiResult<()> {
                     warn!("Not Found");
                     Err(ApiError::NotFound)

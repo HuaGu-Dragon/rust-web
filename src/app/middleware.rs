@@ -1,6 +1,5 @@
 use std::pin::Pin;
 
-use anyhow::Context;
 use axum::{
     RequestExt,
     body::Body,
@@ -23,7 +22,11 @@ impl AsyncAuthorizeRequest<Body> for AuthLayer {
     type ResponseBody = Body;
 
     type Future = Pin<
-        Box<dyn Future<Output = Result<Request<Self::RequestBody>, Response<Self::ResponseBody>>>>,
+        Box<
+            dyn Future<Output = Result<Request<Self::RequestBody>, Response<Self::ResponseBody>>>
+                + Send
+                + 'static,
+        >,
     >;
 
     fn authorize(&mut self, mut request: Request<Body>) -> Self::Future {

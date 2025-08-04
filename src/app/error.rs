@@ -7,6 +7,7 @@ use axum::{
 use axum_extra::typed_header::TypedHeaderRejection;
 use axum_valid::ValidRejection;
 use serde::Serialize;
+use tracing::warn;
 
 pub type ApiResult<T> = Result<T, ApiError>;
 
@@ -30,6 +31,8 @@ pub enum ApiError {
     JwtError(#[from] jsonwebtoken::errors::Error),
     #[error("Failed to extract typed header: {0}")]
     TypedHeaderError(#[from] TypedHeaderRejection),
+    #[error("Account or Password is incorrect")]
+    LoginError,
     #[error("Internal Server Error")]
     Internal(#[from] anyhow::Error),
 }
@@ -69,7 +72,7 @@ impl ApiError {
                 tracing::warn!(error = ?e, "Internal server error");
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR
             }
-            ApiError::JwtError(_) | ApiError::TypedHeaderError(_) => {
+            ApiError::JwtError(_) | ApiError::TypedHeaderError(_) | ApiError::LoginError => {
                 axum::http::StatusCode::UNAUTHORIZED
             }
         }

@@ -7,7 +7,7 @@ use crate::{
     config, database, logger,
 };
 
-mod auth;
+pub mod auth;
 pub mod error;
 pub mod extract;
 mod latency;
@@ -15,6 +15,7 @@ pub mod middleware;
 pub mod params;
 pub mod response;
 mod server;
+pub mod util;
 pub mod validation;
 
 pub type ApiReturn<T> = ApiResult<ApiResponse<T>>;
