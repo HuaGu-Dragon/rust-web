@@ -2,8 +2,9 @@ use argon2::password_hash::Error;
 use axum::{
     Json,
     extract::rejection::{JsonRejection, PathRejection, QueryRejection},
-    response::IntoResponse,
+    response::{IntoResponse, Response},
 };
+use axum_extra::typed_header::TypedHeaderRejection;
 use axum_valid::ValidRejection;
 use serde::Serialize;
 
@@ -27,6 +28,8 @@ pub enum ApiError {
     HashPassword(String),
     #[error("JWT Error: {0}")]
     JwtError(#[from] jsonwebtoken::errors::Error),
+    #[error("Failed to extract typed header: {0}")]
+    TypedHeaderError(#[from] TypedHeaderRejection),
     #[error("Internal Server Error")]
     Internal(#[from] anyhow::Error),
 }
@@ -66,7 +69,9 @@ impl ApiError {
                 tracing::warn!(error = ?e, "Internal server error");
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR
             }
-            ApiError::JwtError(_) => axum::http::StatusCode::UNAUTHORIZED,
+            ApiError::JwtError(_) | ApiError::TypedHeaderError(_) => {
+                axum::http::StatusCode::UNAUTHORIZED
+            }
         }
     }
 }
@@ -80,5 +85,11 @@ impl IntoResponse for ApiError {
         });
 
         (status, body).into_response()
+    }
+}
+
+impl From<ApiError> for Response {
+    fn from(value: ApiError) -> Self {
+        value.into_response()
     }
 }

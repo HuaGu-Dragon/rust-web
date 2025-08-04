@@ -1,3 +1,5 @@
+use std::sync::LazyLock;
+
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, get_current_timestamp};
 use serde::{Deserialize, Serialize};
 
@@ -6,7 +8,7 @@ use crate::{
     config,
 };
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Principal {
     pub id: String,
     pub name: String,
@@ -18,6 +20,8 @@ struct Claims {
     exp: u64,
     iat: u64,
 }
+
+static JWT_SERVICE: LazyLock<JwtService> = LazyLock::new(JwtService::new);
 
 pub struct JwtService {
     encode_key: EncodingKey,
@@ -72,4 +76,8 @@ impl JwtService {
             name: name.to_string(),
         })
     }
+}
+
+pub fn jwt_service() -> &'static JwtService {
+    &JWT_SERVICE
 }
