@@ -24,6 +24,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast, Toaster } from "sonner";
 import { login } from "./api/auth";
+import { setToken } from "./api/http";
 
 function Login() {
   const navigate = useNavigate();
@@ -55,6 +56,8 @@ function Login() {
 
       toast.success("Login successful");
       toast.success(result);
+      setToken(result);
+      navigate("/dashboard");
     } catch (error) {
       toast.error(
         error instanceof Error
