@@ -51,5 +51,5 @@ Content-Type: application/json
 
 {
     "account": "wang",
-    "password": "123456"
+    "password": "12345"
 }

@@ -10,7 +10,6 @@ use axum::extract::ConnectInfo;
 use axum::{Router, extract::State, routing};
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 use serde::Deserialize;
-use tracing::info;
 use validator::Validate;
 
 pub fn create_router() -> Router<AppState> {

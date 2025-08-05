@@ -19,10 +19,11 @@ import {
   FormItem,
   FormMessage,
 } from "./components/ui/form";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast, Toaster } from "sonner";
+import { login } from "./api/auth";
 
 function Login() {
   const navigate = useNavigate();
@@ -46,12 +47,31 @@ function Login() {
   });
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log(data);
+    try {
+      const result = await login({
+        account: data.account,
+        password: data.password,
+      });
+
+      toast.success("Login successful");
+      toast.success(result);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message.length > 0
+            ? error.message
+            : "Login failed"
+          : "Login failed",
+        {
+          duration: 2000,
+        }
+      );
+    }
   }
 
-  async function onError(errors: any) {
+  async function onError(errors: FieldErrors<z.infer<typeof formSchema>>) {
     if (errors.account && errors.password) {
-      toast.error("Empty email and password!", {
+      toast.error("Empty account and password!", {
         duration: 2000,
         icon: "❌",
       });
@@ -59,7 +79,7 @@ function Login() {
       return;
     }
     if (errors.account) {
-      toast.error("Invalid email!", {
+      toast.error("Invalid account!", {
         duration: 2000,
         icon: "❌",
       });
@@ -70,8 +90,6 @@ function Login() {
         icon: "❌",
       });
     }
-    console.log(errors);
-    console.log(errors);
   }
 
   return (
