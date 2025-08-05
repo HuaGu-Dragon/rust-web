@@ -10,7 +10,7 @@ function App() {
   };
 
   return (
-    <div className="" onClick={handleCardClick}>
+    <div onClick={handleCardClick}>
       <MagicBento
         textAutoHide={true}
         enableStars={true}

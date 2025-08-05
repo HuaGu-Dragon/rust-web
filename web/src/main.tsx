@@ -5,6 +5,7 @@ import App from "./App.tsx";
 import LiquidChrome from "./block/Backgrounds/LiquidChrome/LiquidChrome.tsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./Login.tsx";
+import Page from "./dashboard.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <div className="w-screen h-screen overflow-hidden relative">
@@ -20,17 +21,32 @@ createRoot(document.getElementById("root")!).render(
       />
     </div>
 
-    <div className="absolute inset-0 z-10 w-auto pointer-events-none flex justify-center items-center">
-      <div className="relative pointer-events-auto w-auto z-10">
-        <StrictMode>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<App />} />
-              <Route path="/login" element={<Login />} />
-            </Routes>
-          </BrowserRouter>
-        </StrictMode>
-      </div>
-    </div>
+    <StrictMode>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <div className="absolute inset-0 z-10 pointer-events-none w-auto h-screen justify-center items-center flex">
+                <div className="relative pointer-events-auto z-10">
+                  <App />
+                </div>
+              </div>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <div className="absolute inset-0 z-10 pointer-events-none w-auto h-screen justify-center items-center flex">
+                <div className="relative pointer-events-auto z-10">
+                  <Login />
+                </div>
+              </div>
+            }
+          />
+          <Route path="/dashboard" element={<Page />} />
+        </Routes>
+      </BrowserRouter>
+    </StrictMode>
   </div>
 );
