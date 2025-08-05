@@ -7,7 +7,6 @@ use axum::{
 use axum_extra::typed_header::TypedHeaderRejection;
 use axum_valid::ValidRejection;
 use serde::Serialize;
-use tracing::warn;
 
 pub type ApiResult<T> = Result<T, ApiError>;
 

@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 import LiquidChrome from "./block/Backgrounds/LiquidChrome/LiquidChrome.tsx";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 createRoot(document.getElementById("root")!).render(
   <div className="w-screen h-screen overflow-hidden relative">
@@ -21,7 +22,11 @@ createRoot(document.getElementById("root")!).render(
     <div className="absolute inset-0 z-10 pointer-events-none flex justify-center items-center">
       <div className="relative pointer-events-auto z-10">
         <StrictMode>
-          <App />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<App />} />
+            </Routes>
+          </BrowserRouter>
         </StrictMode>
       </div>
     </div>
