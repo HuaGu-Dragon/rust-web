@@ -38,6 +38,12 @@ export interface UserParams {
     enabled: boolean;
 }
 
+export interface QueryParams {
+    id: string,
+    name?: string,
+    mobilePhone?: string
+}
+
 export async function getUserPage(params?: UserQueryParams): Promise<ApiResult<Page<User>>> {
     const { data } = await http.get<ApiResult<Page<User>>>("/users", { params });
 
@@ -58,8 +64,7 @@ export async function createUser(params: UserParams): Promise<ApiResult<User>> {
     return data;
 }
 
-export async function updateUser({ id, ...params }: UserParams): Promise<ApiResult<User>> {
-    params.password = params.password || "";
+export async function updateUser({ id, ...params }: QueryParams): Promise<ApiResult<User>> {
     const { data } = await http.put<ApiResult<User>>(`/users/${id}`, params);
 
     if (data.code !== 0) {

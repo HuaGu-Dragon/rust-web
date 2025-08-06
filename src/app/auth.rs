@@ -51,8 +51,8 @@ impl JwtService {
 
         let claims = Claims {
             sub: format!("{}:{}", principal.id, principal.name),
-            exp: now,
-            iat: now.saturating_add(self.expiration),
+            exp: now.saturating_add(self.expiration),
+            iat: now,
         };
 
         Ok(jsonwebtoken::encode(

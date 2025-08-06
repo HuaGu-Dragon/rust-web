@@ -1,5 +1,5 @@
 @user = 01986afed7f97f31bb87577ec490e14a
-@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk4NmFmZWQ3Zjk3ZjMxYmI4NzU3N2VjNDkwZTE0YTrmnY7lm5siLCJleHAiOjE3NTQ0Njg3NDIsImlhdCI6MTc1NDQ3MjM0Mn0.D9oPXlruE90e08PrKzAqy94kqCIFJKYIBI2uTBQKbHU
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk4NmFmZWQ3Zjk3ZjMxYmI4NzU3N2VjNDkwZTE0YTrmnY7lm5siLCJleHAiOjE3NTQ0NzYyODQsImlhdCI6MTc1NDQ3MjY4NH0.xvBGtKwKJUyQ74jf3Ex4r9TWH5409cOcdgdqniMeMAE
 
 ###
 
@@ -21,9 +21,9 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "name": "王五",
+    "name": "admin",
     "gender": "male",
-    "account": "wang",
+    "account": "admin",
     "password": "123456",
     "mobile_phone": "18361631783",
     "birthday": "2025-06-11"

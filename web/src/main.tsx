@@ -11,9 +11,9 @@ import { queryClient } from "./api/query"; // 导入之前定义的 queryClient
 import { Toaster } from "sonner";
 
 createRoot(document.getElementById("root")!).render(
-  <div className="w-screen h-screen relative">
+  <div className="w-screen h-screen relative bg-white">
     <div
-      className="absolute inset-0 z-0 pointer-events-auto"
+      className="absolute inset-0 z-0 pointer-events-auto bg-white"
       style={{ mixBlendMode: "multiply" }}
     >
       <LiquidChrome
