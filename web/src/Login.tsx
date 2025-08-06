@@ -22,7 +22,7 @@ import {
 import { useForm, type FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import { login } from "./api/auth";
 import { setToken } from "./api/http";
 
@@ -55,7 +55,6 @@ function Login() {
       });
 
       toast.success("Login successful");
-      toast.success(result);
       setToken(result);
       navigate("/dashboard");
     } catch (error) {
@@ -171,7 +170,6 @@ function Login() {
           </CardFooter>
         </form>
       </Form>
-      <Toaster richColors />
     </Card>
   );
 }

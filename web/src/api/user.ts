@@ -24,8 +24,7 @@ export interface Page<T> {
 
 export interface UserQueryParams {
     keyword?: string;
-    page?: number;
-    size?: number;
+    page_size?: number;
 }
 
 export interface UserParams {

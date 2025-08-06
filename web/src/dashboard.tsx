@@ -14,8 +14,41 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import AnimatedList from "./block/Components/AnimatedList/AnimatedList";
+import { useEffect } from "react";
+import { getToken } from "./api/http";
+import { getUserPage } from "./api/user";
+import { useQuery } from "@tanstack/react-query";
+import { toast, Toaster } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export default function Page() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (getToken() === null) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["users", 1, 100],
+    queryFn: () => getUserPage({ page_size: 100 }),
+  });
+
+  useEffect(() => {
+    if (error) {
+      if (error.message?.includes("ExpiredSignature")) {
+        localStorage.removeItem("__TOKEN__");
+        toast.error("Session expired, please log in again.", {
+          duration: 2000,
+        });
+        navigate("/login");
+      }
+    }
+  }, [error, navigate]);
+
+  const userNames = data?.data?.items?.map((user) => user.name) || [];
+
   return (
     <SidebarProvider className="dark">
       <AppSidebar className="dark flex" />
@@ -38,18 +71,27 @@ export default function Page() {
           </Breadcrumb>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 h-[calc(100vh-4rem)] overflow-hidden">
-          <AnimatedList
-            className="w-full"
-            items={Array.from({ length: 100 }).map(
-              (_, index) => "string" + index
-            )}
-            onItemSelect={(item, index) => console.log(item, index)}
-            showGradients={true}
-            enableArrowNavigation={true}
-            displayScrollbar={true}
-          />
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
+            </div>
+          ) : error ? (
+            <div className="text-red-500 text-center">
+              <p>Error loading user data: {error.message}</p>
+            </div>
+          ) : (
+            <AnimatedList
+              className="w-full"
+              items={userNames}
+              onItemSelect={(item, index) => console.log(item, index)}
+              showGradients={true}
+              enableArrowNavigation={true}
+              displayScrollbar={true}
+            />
+          )}
         </div>
       </SidebarInset>
+      <Toaster richColors />
     </SidebarProvider>
   );
 }

@@ -6,6 +6,9 @@ import LiquidChrome from "./block/Backgrounds/LiquidChrome/LiquidChrome.tsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./Login.tsx";
 import Page from "./dashboard.tsx";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./api/query"; // 导入之前定义的 queryClient
+import { Toaster } from "sonner";
 
 createRoot(document.getElementById("root")!).render(
   <div className="w-screen h-screen relative">
@@ -22,31 +25,34 @@ createRoot(document.getElementById("root")!).render(
     </div>
 
     <StrictMode>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <div className="absolute inset-0 z-10 pointer-events-none w-auto h-screen justify-center items-center flex">
-                <div className="relative pointer-events-auto z-10">
-                  <App />
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <div className="absolute inset-0 z-10 pointer-events-none w-auto h-screen justify-center items-center flex">
+                  <div className="relative pointer-events-auto z-10">
+                    <App />
+                  </div>
                 </div>
-              </div>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <div className="absolute inset-0 z-10 pointer-events-none w-auto h-screen justify-center items-center flex">
-                <div className="relative pointer-events-auto z-10">
-                  <Login />
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <div className="absolute inset-0 z-10 pointer-events-none w-auto h-screen justify-center items-center flex">
+                  <div className="relative pointer-events-auto z-10">
+                    <Login />
+                  </div>
                 </div>
-              </div>
-            }
-          />
-          <Route path="/dashboard" element={<Page />} />
-        </Routes>
-      </BrowserRouter>
+              }
+            />
+            <Route path="/dashboard" element={<Page />} />
+          </Routes>
+        </BrowserRouter>
+      </QueryClientProvider>
+      <Toaster richColors />
     </StrictMode>
   </div>
 );

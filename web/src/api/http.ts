@@ -12,6 +12,10 @@ export function setToken(token: string) {
     localStorage.setItem(TOKEN_KEY, token);
 }
 
+export function getToken() {
+    return localStorage.getItem(TOKEN_KEY);
+}
+
 const instance = axios.create({
     baseURL: "http://0.0.0.0:3000/api",
     headers: {
