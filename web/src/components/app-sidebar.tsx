@@ -50,72 +50,12 @@ const data = {
           url: "#",
           isActive: true,
         },
-        {
-          title: "Rendering",
-          url: "#",
-        },
-        {
-          title: "Caching",
-          url: "#",
-        },
-        {
-          title: "Styling",
-          url: "#",
-        },
-        {
-          title: "Optimizing",
-          url: "#",
-        },
-        {
-          title: "Configuring",
-          url: "#",
-        },
-        {
-          title: "Testing",
-          url: "#",
-        },
-        {
-          title: "Authentication",
-          url: "#",
-        },
-        {
-          title: "Deploying",
-          url: "#",
-        },
-        {
-          title: "Upgrading",
-          url: "#",
-        },
-        {
-          title: "Examples",
-          url: "#",
-        },
       ],
     },
     {
       title: "API Reference",
       url: "#",
       items: [
-        {
-          title: "Components",
-          url: "#",
-        },
-        {
-          title: "File Conventions",
-          url: "#",
-        },
-        {
-          title: "Functions",
-          url: "#",
-        },
-        {
-          title: "next.config.js Options",
-          url: "#",
-        },
-        {
-          title: "CLI",
-          url: "#",
-        },
         {
           title: "Edge Runtime",
           url: "#",
@@ -134,18 +74,6 @@ const data = {
           title: "Fast Refresh",
           url: "#",
         },
-        {
-          title: "Next.js Compiler",
-          url: "#",
-        },
-        {
-          title: "Supported Browsers",
-          url: "#",
-        },
-        {
-          title: "Turbopack",
-          url: "#",
-        },
       ],
     },
     {
@@ -162,7 +90,7 @@ const data = {
 };
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar {...props}>
+    <Sidebar className="dark" {...props}>
       <SidebarHeader>
         <VersionSwitcher
           versions={data.versions}
@@ -177,7 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             key={item.title}
             title={item.title}
             defaultOpen
-            className="group/collapsible"
+            className="group/collapsible dark"
           >
             <SidebarGroup>
               <SidebarGroupLabel

@@ -8,7 +8,7 @@ import Login from "./Login.tsx";
 import Page from "./dashboard.tsx";
 
 createRoot(document.getElementById("root")!).render(
-  <div className="w-screen h-screen overflow-hidden relative">
+  <div className="w-screen h-screen relative">
     <div
       className="absolute inset-0 z-0 pointer-events-auto"
       style={{ mixBlendMode: "multiply" }}
