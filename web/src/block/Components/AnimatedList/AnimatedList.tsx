@@ -6,9 +6,9 @@ import React, {
   useRef,
   useState,
   useEffect,
-  ReactNode,
-  MouseEventHandler,
-  UIEvent,
+  type ReactNode,
+  type MouseEventHandler,
+  type UIEvent,
 } from "react";
 import { motion, useInView } from "framer-motion";
 
@@ -95,7 +95,7 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
     setTopGradientOpacity(Math.min(scrollTop / 50, 1));
     const bottomDistance = scrollHeight - (scrollTop + clientHeight);
     setBottomGradientOpacity(
-      scrollHeight <= clientHeight ? 0 : Math.min(bottomDistance / 50, 1),
+      scrollHeight <= clientHeight ? 0 : Math.min(bottomDistance / 50, 1)
     );
   };
 
@@ -128,7 +128,7 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
     if (!keyboardNav || selectedIndex < 0 || !listRef.current) return;
     const container = listRef.current;
     const selectedItem = container.querySelector(
-      `[data-index="${selectedIndex}"]`,
+      `[data-index="${selectedIndex}"]`
     ) as HTMLElement | null;
     if (selectedItem) {
       const extraMargin = 50;
@@ -155,7 +155,7 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
     <div className={`relative w-[500px] ${className}`}>
       <div
         ref={listRef}
-        className={`max-h-[400px] overflow-y-auto p-4 ${
+        className={`h-[calc(100vh-8rem)] overflow-y-auto p-4 ${
           displayScrollbar
             ? "[&::-webkit-scrollbar]:w-[8px] [&::-webkit-scrollbar-track]:bg-[#060010] [&::-webkit-scrollbar-thumb]:bg-[#222] [&::-webkit-scrollbar-thumb]:rounded-[4px]"
             : "scrollbar-hide"
@@ -180,7 +180,9 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
             }}
           >
             <div
-              className={`p-4 bg-[#111] rounded-lg ${selectedIndex === index ? "bg-[#222]" : ""} ${itemClassName}`}
+              className={`p-4 bg-[#111] rounded-lg ${
+                selectedIndex === index ? "bg-[#222]" : ""
+              } ${itemClassName}`}
             >
               <p className="text-white m-0">{item}</p>
             </div>

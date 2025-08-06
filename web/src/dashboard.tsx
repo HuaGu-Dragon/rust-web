@@ -13,11 +13,12 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import AnimatedList from "./block/Components/AnimatedList/AnimatedList";
 
 export default function Page() {
   return (
     <SidebarProvider className="dark">
-      <AppSidebar className="dark" />
+      <AppSidebar className="dark flex" />
       <SidebarInset>
         <header className="bg-background sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b px-4 dark">
           <SidebarTrigger className="-ml-1 dark" />
@@ -36,15 +37,17 @@ export default function Page() {
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          {Array.from({ length: 100 }).map((_, index) => (
-            <div
-              key={index}
-              className="bg-muted/50 aspect-video h-12 w-full rounded-lg"
-            >
-              Hello World
-            </div>
-          ))}
+        <div className="flex flex-1 flex-col gap-4 p-4 h-[calc(100vh-4rem)] overflow-hidden">
+          <AnimatedList
+            className="w-full"
+            items={Array.from({ length: 100 }).map(
+              (_, index) => "string" + index
+            )}
+            onItemSelect={(item, index) => console.log(item, index)}
+            showGradients={true}
+            enableArrowNavigation={true}
+            displayScrollbar={true}
+          />
         </div>
       </SidebarInset>
     </SidebarProvider>
