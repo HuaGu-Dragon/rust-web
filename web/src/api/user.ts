@@ -33,7 +33,7 @@ export interface UserParams {
     gender: "male" | "female";
     account: string;
     password?: string;
-    mobilePhone: string;
+    mobile_phone: string;
     birthday: string;
     enabled: boolean;
 }

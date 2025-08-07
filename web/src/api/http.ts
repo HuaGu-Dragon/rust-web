@@ -17,7 +17,7 @@ export function getToken() {
 }
 
 const instance = axios.create({
-    baseURL: "http://0.0.0.0:3000/api",
+    baseURL: "/api",
     headers: {
         "Content-Type": "application/json",
     },

@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import { format } from "date-fns";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,16 +17,18 @@ import {
 import AnimatedList from "./block/Components/AnimatedList/AnimatedList";
 import { useEffect, useMemo, useState } from "react";
 import { getToken } from "./api/http";
-import { deleteUser, getUserPage, updateUser } from "./api/user";
+import { createUser, deleteUser, getUserPage, updateUser } from "./api/user";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "./components/ui/dialog";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -38,6 +41,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "./components/ui/form";
 import {
@@ -51,6 +55,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "./components/ui/popover";
+import { cn } from "./lib/utils";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
 
 export default function Page() {
   const [selectedItem, setSelectedItem] = useState<{
@@ -97,6 +116,31 @@ export default function Page() {
     },
   });
 
+  const create_Schema = z.object({
+    name: z.string().min(1).max(16),
+    gender: z.enum(["male", "female"]),
+    account: z.string().max(16),
+    password: z.string().min(6).max(16),
+    phone: z.string().length(11, {
+      message: "Phone number must be exactly 11 characters.",
+    }),
+    birthday: z.date(),
+    enabled: z.boolean(),
+  });
+
+  const create_form = useForm<z.infer<typeof create_Schema>>({
+    resolver: zodResolver(create_Schema),
+    defaultValues: {
+      name: "",
+      gender: "male",
+      account: "",
+      password: "",
+      phone: "",
+      birthday: new Date(),
+      enabled: false,
+    },
+  });
+
   const users = useMemo(() => data?.data?.items || [], [data]);
   const userNames = useMemo(() => users.map((user) => user.name), [users]);
 
@@ -135,6 +179,28 @@ export default function Page() {
     }
   }
 
+  async function onSubmitCreate(params: z.infer<typeof create_Schema>) {
+    try {
+      await createUser({
+        name: params.name,
+        account: params.account,
+        password: params.password,
+        gender: params.gender,
+        mobile_phone: params.phone,
+        birthday: format(params.birthday, "yyyy-MM-dd"),
+        enabled: params.enabled,
+      });
+
+      toast.success("User created successfully");
+      refetch();
+    } catch (error) {
+      toast.error(
+        "Fail to create user: " +
+          (error instanceof Error ? error.message : "Unknown error")
+      );
+    }
+  }
+
   async function handleDeleteUser() {
     if (!selectedItem) return;
     console.log("Deleting user:", selectedItem);
@@ -164,19 +230,241 @@ export default function Page() {
         <header className="bg-background sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b px-4 dark">
           <SidebarTrigger className="-ml-1 dark" />
           <Separator orientation="vertical" className="mr-2 h-4 dark" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">
-                  Building Your Application
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <div className="flex justify-between items-center w-full">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="#">
+                    Building Your Application
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">Add User</Button>
+              </DialogTrigger>
+              <DialogContent className="dark">
+                <DialogHeader>
+                  <DialogTitle>Add New User</DialogTitle>
+                  <DialogDescription>
+                    Fill in the details to create a new user account.
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...create_form}>
+                  <form onSubmit={create_form.handleSubmit(onSubmitCreate)}>
+                    <div className="py-4">
+                      <div className="flex w-full gap-4 mt-4">
+                        <div>
+                          <Label htmlFor="name">Name</Label>
+                          <FormField
+                            control={create_form.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input
+                                    id="name"
+                                    {...field}
+                                    type="text"
+                                    required
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="account">Account</Label>
+                          <FormField
+                            control={create_form.control}
+                            name="account"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input
+                                    id="account"
+                                    {...field}
+                                    type="text"
+                                    required
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                      <div className="gap-4 w-full flex mt-4">
+                        <div>
+                          <Label htmlFor="password">Password</Label>
+                          <FormField
+                            control={create_form.control}
+                            name="password"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input
+                                    id="password"
+                                    {...field}
+                                    type="password"
+                                    required
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="phone">Mobile Phone number</Label>
+                          <FormField
+                            control={create_form.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input
+                                    id="phone"
+                                    {...field}
+                                    type="text"
+                                    required
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                      <div className="gap-4 w-full flex mt-4">
+                        <FormField
+                          control={create_form.control}
+                          name="gender"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Gender</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue
+                                      className="dark"
+                                      placeholder="Select a gender"
+                                    />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="dark">
+                                  <SelectItem value="male" className="dark">
+                                    Male
+                                  </SelectItem>
+                                  <SelectItem value="female" className="dark">
+                                    Female
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={create_form.control}
+                          name="enabled"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Status</FormLabel>
+                              <Select
+                                onValueChange={(value) =>
+                                  field.onChange(value === "true")
+                                }
+                                defaultValue={field.value ? "true" : "false"}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue
+                                      className="dark"
+                                      placeholder="Select a status"
+                                    />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="dark">
+                                  <SelectItem value="true" className="dark">
+                                    Enabled
+                                  </SelectItem>
+                                  <SelectItem value="false" className="dark">
+                                    Disabled
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={create_form.control}
+                          name="birthday"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col dark">
+                              <FormLabel>Date of birth</FormLabel>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant={"outline"}
+                                      className={cn(
+                                        "w-[240px] pl-3 text-left font-normal",
+                                        !field.value && "text-muted-foreground"
+                                      )}
+                                    >
+                                      {field.value ? (
+                                        format(field.value, "PPP")
+                                      ) : (
+                                        <span>Pick a date</span>
+                                      )}
+                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                  className="w-auto p-0 dark"
+                                  align="start"
+                                >
+                                  <Calendar
+                                    mode="single"
+                                    selected={field.value}
+                                    onSelect={field.onChange}
+                                    disabled={(date) =>
+                                      date > new Date() ||
+                                      date < new Date("1900-01-01")
+                                    }
+                                    captionLayout="dropdown"
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-4 flex justify-end gap-2">
+                      <DialogClose asChild>
+                        <Button variant="outline">Cancel</Button>
+                      </DialogClose>
+                      <Button type="submit">Create User</Button>
+                    </div>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 h-[calc(100vh-4rem)] overflow-hidden">
           {isLoading ? (
