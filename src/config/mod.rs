@@ -11,7 +11,7 @@ use database::DataBaseConfig;
 use auth::JwtConfig;
 
 mod auth;
-mod database;
+pub mod database;
 pub mod server;
 
 static CONFIG: LazyLock<AppConfig> =

@@ -2,6 +2,7 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct DataBaseConfig {
+    pub r#type: DatabaseType,
     pub host: Option<String>,
     pub port: Option<u16>,
     pub username: Option<String>,
@@ -10,7 +11,17 @@ pub struct DataBaseConfig {
     pub schema: Option<String>,
 }
 
+#[derive(Debug, Deserialize)]
+pub enum DatabaseType {
+    Postgres,
+    Sqlite,
+}
+
 impl DataBaseConfig {
+    pub fn get_type(&self) -> &DatabaseType {
+        &self.r#type
+    }
+
     pub fn host(&self) -> &str {
         self.host.as_deref().unwrap_or("127.0.0.1")
     }
