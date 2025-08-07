@@ -12,12 +12,13 @@ axum-valid = { version = "0.24.0", features = ["full_validator"] }
 config = { version = "0.15.13", features = ["toml"] }
 jsonwebtoken = "9.3.1"
 regex = "1.11.1"
+rust-embed = { version = "8.7.2", features = ["axum", "axum-ex", "tokio", "compression", "debug-embed", "include-exclude", "include-flate", "interpolate-folder-path", "mime-guess"] }
 sea-orm = { version = "1.1.14", features = ["with-chrono", "debug-print", "sqlx-postgres", "with-rust_decimal", "runtime-tokio"] }
 serde = { version = "1.0.219", features = ["derive"] }
 serde_with = "3.14.0"
 thiserror = "2.0.12"
 tokio = { version = "1.47.0", features = ["full"] }
-tower-http = { version = "0.6.6", features = ["cors", "limit", "normalize-path", "timeout", "trace", "auth"] }
+tower-http = { version = "0.6.6", features = ["cors", "limit", "normalize-path", "timeout", "trace", "auth", "compression-full"] }
 tracing = { version = "0.1.41", features = ["async-await"] }
 tracing-subscriber = { version = "0.3.19", features = ["env-filter", "chrono"] }
 uuid = { version = "1.17.0", features = ["v4", "v7"] }

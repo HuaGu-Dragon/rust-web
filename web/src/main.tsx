@@ -1,14 +1,17 @@
-import { StrictMode } from "react";
+import { StrictMode, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.tsx";
 import LiquidChrome from "./block/Backgrounds/LiquidChrome/LiquidChrome.tsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Login from "./Login.tsx";
-import Page from "./dashboard.tsx";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./api/query"; // 导入之前定义的 queryClient
+import { queryClient } from "./api/query";
 import { Toaster } from "sonner";
+import LoadingFallback from "./LoadingFallback.tsx";
+
+// 使用懒加载导入组件
+const App = lazy(() => import("./App.tsx"));
+const Login = lazy(() => import("./Login.tsx"));
+const Page = lazy(() => import("./dashboard.tsx"));
 
 createRoot(document.getElementById("root")!).render(
   <div className="w-screen h-screen relative bg-white">
@@ -27,29 +30,31 @@ createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <div className="absolute inset-0 z-10 pointer-events-none w-auto h-screen justify-center items-center flex">
-                  <div className="relative pointer-events-auto z-10">
-                    <App />
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <div className="absolute inset-0 z-10 pointer-events-none w-auto h-screen justify-center items-center flex">
+                    <div className="relative pointer-events-auto z-10">
+                      <App />
+                    </div>
                   </div>
-                </div>
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                <div className="absolute inset-0 z-10 pointer-events-none w-auto h-screen justify-center items-center flex">
-                  <div className="relative pointer-events-auto z-10">
-                    <Login />
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <div className="absolute inset-0 z-10 pointer-events-none w-auto h-screen justify-center items-center flex">
+                    <div className="relative pointer-events-auto z-10">
+                      <Login />
+                    </div>
                   </div>
-                </div>
-              }
-            />
-            <Route path="/dashboard" element={<Page />} />
-          </Routes>
+                }
+              />
+              <Route path="/dashboard" element={<Page />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </QueryClientProvider>
       <Toaster richColors />

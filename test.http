@@ -1,4 +1,4 @@
-@user = 01986afed7f97f31bb87577ec490e14a
+@user = 11467064770821
 @token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk4NmFmZWQ3Zjk3ZjMxYmI4NzU3N2VjNDkwZTE0YTrmnY7lm5siLCJleHAiOjE3NTQ0NzYyODQsImlhdCI6MTc1NDQ3MjY4NH0.xvBGtKwKJUyQ74jf3Ex4r9TWH5409cOcdgdqniMeMAE
 
 ###
@@ -43,6 +43,7 @@ Content-Type: application/json
 
 
 DELETE http://0.0.0.0:3000/api/users/{{user}} HTTP/1.1
+Authorization: Bearer {{token}}
 
 ### Login User
 
