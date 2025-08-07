@@ -14,8 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import AnimatedList from "./block/Components/AnimatedList/AnimatedList";
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { getToken } from "./api/http";
 import { createUser, deleteUser, getUserPage, updateUser } from "./api/user";
 import { useQuery } from "@tanstack/react-query";
@@ -70,6 +69,11 @@ import {
 import { cn } from "./lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+
+// Lazy load the AnimatedList to split code
+const AnimatedList = lazy(
+  () => import("./block/Components/AnimatedList/AnimatedList")
+);
 
 export default function Page() {
   const [selectedItem, setSelectedItem] = useState<{
@@ -476,14 +480,22 @@ export default function Page() {
               <p>Error loading user data: {error.message}</p>
             </div>
           ) : (
-            <AnimatedList
-              className="w-full"
-              items={userNames}
-              onItemSelect={handleItemSelect}
-              showGradients={true}
-              enableArrowNavigation={true}
-              displayScrollbar={true}
-            />
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full" />
+                </div>
+              }
+            >
+              <AnimatedList
+                className="w-full"
+                items={userNames}
+                onItemSelect={handleItemSelect}
+                showGradients={true}
+                enableArrowNavigation={true}
+                displayScrollbar={true}
+              />
+            </Suspense>
           )}
         </div>
       </SidebarInset>
