@@ -3,8 +3,6 @@ use std::fmt::Display;
 use tower_http::trace::OnResponse;
 use tracing::info;
 
-use crate::app::auth::Principal;
-
 #[derive(Debug, Clone, Copy)]
 pub struct LatencyLayer;
 
@@ -13,11 +11,8 @@ impl<B> OnResponse<B> for LatencyLayer {
         self,
         response: &axum::http::Response<B>,
         latency: std::time::Duration,
-        span: &tracing::Span,
+        _span: &tracing::Span,
     ) {
-        if let Some(principal) = response.extensions().get::<Principal>() {
-            span.record("user_id", &principal.id);
-        }
         info!(
             latency = %DurationWrapper(latency),
             status = %response.status(),

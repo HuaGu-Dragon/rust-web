@@ -41,5 +41,11 @@ pub async fn run(router: Router<AppState>) -> anyhow::Result<()> {
     let state = AppState::new(db);
     let server = server::Server::new(config::get().server());
 
-    server.start(router, state).await
+    tokio::select! {
+        res = server.start(router, state) => res,
+        _ = tokio::signal::ctrl_c() => {
+            info!("Received Ctrl+C, shutting down...");
+            Ok(())
+        }
+    }
 }

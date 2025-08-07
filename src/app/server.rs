@@ -24,11 +24,11 @@ impl Server {
     }
 
     pub async fn start(&self, router: Router<AppState>, state: AppState) -> anyhow::Result<()> {
-        let router = self.build_router(router, state)?;
+        let router = self.build_router(router, state);
         let port = self.config.port();
 
         let listener = TcpListener::bind(format!("0.0.0.0:{port}")).await?;
-        info!("listening on {}", listener.local_addr()?);
+        info!("listening on http://{}", listener.local_addr()?);
 
         axum::serve(
             listener,
@@ -39,8 +39,8 @@ impl Server {
         Ok(())
     }
 
-    fn build_router(&self, router: Router<AppState>, state: AppState) -> anyhow::Result<Router> {
-        Ok(Router::new()
+    fn build_router(&self, router: Router<AppState>, state: AppState) -> Router {
+        Router::new()
             .merge(router)
             .layer(NormalizePathLayer::trim_trailing_slash())
             .layer(RequestBodyLimitLayer::new(10 * 1024 * 1024))
@@ -62,6 +62,6 @@ impl Server {
             )
             .layer(CorsLayer::permissive())
             .layer(TimeoutLayer::new(Duration::from_secs(30)))
-            .with_state(state))
+            .with_state(state)
     }
 }
