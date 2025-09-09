@@ -28,7 +28,7 @@ pub async fn init() -> anyhow::Result<DatabaseConnection> {
         .sqlx_logging(false)
         .set_schema_search_path(config.schema());
 
-    Ok(Database::connect(option)
+    Database::connect(option)
         .await
-        .context("Connect to the database")?)
+        .context("Connect to the database")
 }

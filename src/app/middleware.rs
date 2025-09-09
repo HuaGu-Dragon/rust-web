@@ -34,7 +34,7 @@ impl AsyncAuthorizeRequest<Body> for AuthLayer {
             let TypedHeader(Authorization(bearer)) = request
                 .extract_parts::<TypedHeader<Authorization<Bearer>>>()
                 .await
-                .map_err(|e| ApiError::TypedHeaderError(e))?;
+                .map_err(ApiError::TypedHeaderError)?;
 
             let principal = auth::jwt_service().decode(bearer.token())?;
 
