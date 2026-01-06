@@ -8,6 +8,7 @@ anyhow = "1.0.98"
 argon2 = "0.5.3"
 axum = { version = "0.8.4", features = ["macros"] }
 axum-extra = { version = "0.10.1", features = ["typed-header"] }
+axum-server = { version = "0.8.0", features = ["tls-rustls"] }
 axum-valid = { version = "0.24.0", features = ["full_validator"] }
 config = { version = "0.15.13", features = ["toml"] }
 jsonwebtoken = "9.3.1"

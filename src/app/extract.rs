@@ -81,6 +81,7 @@ impl_validate!(Json);
 pub struct Valid<T>(pub T);
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct ValidPath<T>(pub T);
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -91,4 +92,5 @@ pub struct ValidJson<T>(pub T);
 
 impl_validate_request!(ValidQuery, Query, FromRequestParts);
 impl_validate_request!(ValidPath, Path, FromRequestParts);
+impl_validate_request!(ValidJson, Json, FromRequestParts);
 impl_validate_request!(ValidJson, Json, FromRequest);

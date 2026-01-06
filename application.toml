@@ -4,7 +4,7 @@ secret = "your_secret_key"
 expiration = 3600
 
 [server]
-port = 3000
+port = 25565
 
 [database]
 type = "Sqlite" # Options: "Postgres", "Sqlite"

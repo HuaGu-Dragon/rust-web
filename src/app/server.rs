@@ -1,6 +1,6 @@
 use std::{net::SocketAddr, time::Duration};
 
-use axum::{Router, extract::Request};
+use axum::{Router, extract::Request, http::StatusCode};
 use tokio::net::TcpListener;
 use tower_http::{
     cors::CorsLayer, limit::RequestBodyLimitLayer, normalize_path::NormalizePathLayer,
@@ -61,7 +61,10 @@ impl Server {
                     .on_failure(()),
             )
             .layer(CorsLayer::permissive())
-            .layer(TimeoutLayer::new(Duration::from_secs(30)))
+            .layer(TimeoutLayer::with_status_code(
+                StatusCode::REQUEST_TIMEOUT,
+                Duration::from_secs(30),
+            ))
             .with_state(state)
     }
 }
