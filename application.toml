@@ -6,6 +6,11 @@ expiration = 3600
 [server]
 port = 25565
 
+[ssl]
+enable = true
+cert_path = "./certs/cert.pem"
+key_path  = "./certs/key.pem"
+
 [database]
 type = "Sqlite" # Options: "Postgres", "Sqlite"
 

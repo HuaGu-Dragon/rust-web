@@ -10,9 +10,12 @@ use database::DataBaseConfig;
 
 use auth::JwtConfig;
 
+use crate::config::ssl::SslConfig;
+
 mod auth;
 pub mod database;
 pub mod server;
+pub mod ssl;
 
 static CONFIG: LazyLock<AppConfig> =
     LazyLock::new(|| AppConfig::load().expect("Failed to load configuration"));
@@ -20,6 +23,7 @@ static CONFIG: LazyLock<AppConfig> =
 #[derive(Debug, Deserialize)]
 pub struct AppConfig {
     auth: JwtConfig,
+    ssl: SslConfig,
     server: ServerConfig,
     database: DataBaseConfig,
 }
@@ -50,6 +54,10 @@ impl AppConfig {
 
     pub fn server(&self) -> &ServerConfig {
         &self.server
+    }
+
+    pub fn ssl(&self) -> &SslConfig {
+        &self.ssl
     }
 
     pub fn database(&self) -> &DataBaseConfig {

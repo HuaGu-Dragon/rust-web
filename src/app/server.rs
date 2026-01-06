@@ -1,7 +1,10 @@
-use std::{net::SocketAddr, time::Duration};
+use std::{
+    net::{Ipv4Addr, SocketAddr, SocketAddrV4},
+    time::Duration,
+};
 
 use axum::{Router, extract::Request, http::StatusCode};
-use tokio::net::TcpListener;
+use axum_server::tls_rustls::RustlsConfig;
 use tower_http::{
     cors::CorsLayer, limit::RequestBodyLimitLayer, normalize_path::NormalizePathLayer,
     timeout::TimeoutLayer, trace::TraceLayer,
@@ -11,7 +14,7 @@ use uuid::Uuid;
 
 use crate::{
     app::{AppState, latency::LatencyLayer},
-    config::server::ServerConfig,
+    config::{self, server::ServerConfig},
 };
 
 pub struct Server {
@@ -27,14 +30,26 @@ impl Server {
         let router = self.build_router(router, state);
         let port = self.config.port();
 
-        let listener = TcpListener::bind(format!("0.0.0.0:{port}")).await?;
-        info!("listening on http://{}", listener.local_addr()?);
+        let address = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(0, 0, 0, 0), port));
+        info!("listening on http://{}", address);
 
-        axum::serve(
-            listener,
-            router.into_make_service_with_connect_info::<SocketAddr>(),
-        )
-        .await?;
+        let ssl = config::get().ssl();
+
+        if ssl.enable() {
+            let config = RustlsConfig::from_pem_file(
+                ssl.cert_path().expect("read cert file"),
+                ssl.key_path().expect("read key file"),
+            )
+            .await?;
+
+            axum_server::bind_rustls(address, config)
+                .serve(router.into_make_service_with_connect_info::<SocketAddr>())
+                .await?;
+        } else {
+            axum_server::bind(address)
+                .serve(router.into_make_service_with_connect_info::<SocketAddr>())
+                .await?;
+        }
 
         Ok(())
     }
